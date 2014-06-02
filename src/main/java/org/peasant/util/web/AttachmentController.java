@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -28,21 +29,21 @@ import org.primefaces.model.UploadedFile;
  * @author 谢金光
  */
 @Named(value = "attachmentController")
-@ViewScoped
+@SessionScoped
 public class AttachmentController implements Serializable {
 
     @Inject
     Repository attachRepo;
     
     String owner ;
-    Attachment selected;
+    List<Attachment> selecteds;
 
-    public Attachment getSelected() {
-        return selected;
+    public List<Attachment>  getSelecteds() {
+        return selecteds;
     }
 
-    public void setSelected(Attachment selected) {
-        this.selected = selected;
+    public void setSelecteds(List<Attachment> selecteds) {
+        this.selecteds = selecteds;
     }
 
     public String getOwner() {
@@ -71,7 +72,7 @@ public class AttachmentController implements Serializable {
     }
 
     public StreamedContent getStreamContent(Attachment a) throws IOException {
-        return new DefaultStreamedContent(a.getInputStream(), a.getContentType(), a.getContentType());
+        return new DefaultStreamedContent(a.getInputStream(), a.getContentType(), a.getName());
     }
 
     public void handleFileUpload(FileUploadEvent fue) {
@@ -84,6 +85,11 @@ public class AttachmentController implements Serializable {
         } catch (IOException ex) {
             Logger.getLogger(FileUploadController.class.getName()).log(Level.SEVERE, null, ex);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed", "The file:" + filename + " is failed for uploading! Exception: " + ex.toString()));
+        }
+    }
+    public void destory(){
+        for(Attachment a :this.selecteds){
+            attachRepo.delete(a);
         }
     }
 }
