@@ -34,9 +34,14 @@ public class CharacterEncodingFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String oldReqEncodeing = request.getCharacterEncoding();
         request.setCharacterEncoding(this.encoding);
+        String oldReqEnString2 = request.getCharacterEncoding();
+        String oldRespEncodeing = response.getCharacterEncoding();
         response.setCharacterEncoding(this.encoding);
-        chain.doFilter(request, response);       
+        String oldRespEncodeing2 = response.getCharacterEncoding();
+        chain.doFilter(request, response);
+        String oldRespEncodeing3 = response.getCharacterEncoding();
     }
 
     @Override
