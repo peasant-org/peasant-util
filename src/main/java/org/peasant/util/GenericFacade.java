@@ -81,10 +81,14 @@ public abstract class GenericFacade<T> {
 
             path = root.get(field);
             Object value = params.get(field);
-            if (value instanceof String) {
-                if (((String) value).isEmpty()) {
-                    continue;
-                }
+            if(null==value){
+                subExp=path.isNull();
+                
+                
+            }else if (value instanceof String) {
+//                if (((String) value).isEmpty()) {
+//                    continue;
+//                }
                 subExp = cb.like(path, ((String) value));//like 的patten由客户负责构建，以便用户可以控制结果
             } else if (value instanceof java.util.Collection) {
                 subExp = path.in((java.util.Collection) value);
