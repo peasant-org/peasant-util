@@ -5,6 +5,7 @@
  */
 package org.peasant.util;
 
+
 import java.lang.reflect.Array;
 import java.util.Date;
 import java.util.List;
@@ -18,8 +19,9 @@ import javax.persistence.criteria.Root;
 /**
  *
  * @author 谢金光
+ * @param <T>
  */
-public abstract class GenericFacade<T> {
+public abstract class GenericFacade<T>{
 
     protected Class<T> entityClass;
 
