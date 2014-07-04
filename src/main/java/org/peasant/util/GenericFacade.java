@@ -67,7 +67,63 @@ public abstract class GenericFacade<T> {
         javax.persistence.Query q = getEntityManager().createQuery(cq);
         return ((Long) q.getSingleResult()).intValue();
     }
-    
+
+    public int count(Map<String, Object> params) {
+        CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+        CriteriaQuery cq = cb.createQuery();
+        Root<T> root = cq.from(entityClass);
+        cq.select(getEntityManager().getCriteriaBuilder().count(root));
+        Expression cons = build(cb, root, params);
+        if (cons != null) {
+            cq.where(cons);
+        }
+        javax.persistence.Query q = getEntityManager().createQuery(cq);
+        return ((Long) q.getSingleResult()).intValue();
+    }
+
+    protected Expression build(CriteriaBuilder cb, Root root, Map<String, Object> params) {
+        Expression cons = null;
+        Expression subExp = null;
+        Expression path = null;
+        for (String field : params.keySet()) {
+
+            path = root.get(field);
+            Object value = params.get(field);
+            if (null == value) {
+                subExp = path.isNull();
+
+            } else if (value instanceof String) {
+//                if (((String) value).isEmpty()) {
+//                    continue;
+//                }
+                subExp = cb.like(path, ((String) value));//like 的patten由客户负责构建，以便用户可以控制结果
+            } else if (value instanceof java.util.Collection) {
+                subExp = path.in((java.util.Collection) value);
+            } else if (value.getClass().isArray()) {
+
+                if (Array.getLength(value) < 3) {
+                    if (Comparable.class.isAssignableFrom(value.getClass().getComponentType())) {
+                        Comparable[] vs = (Comparable[]) value;
+                        if (vs[0] != null) {
+                            subExp = cb.greaterThanOrEqualTo(path, vs[0]);
+                        }
+                        if (vs[1] != null) {
+                            subExp = (subExp == null) ? cb.lessThan(path, vs[1]) : cb.and(subExp, cb.lessThan(path, vs[1]));
+                        }
+                        // cb.between((Expression<Comparable>) subExp, vs[0], vs[1]);
+                    }
+                }
+
+            } else {
+                subExp = cb.equal(path, value);
+            }
+
+            cons = null == cons ? subExp : cb.and(cons, subExp);
+
+        }
+        return cons;
+    }
+
     public List<T> findByConditions(Map<String, Object> params) {
 
         CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
@@ -81,11 +137,10 @@ public abstract class GenericFacade<T> {
 
             path = root.get(field);
             Object value = params.get(field);
-            if(null==value){
-                subExp=path.isNull();
-                
-                
-            }else if (value instanceof String) {
+            if (null == value) {
+                subExp = path.isNull();
+
+            } else if (value instanceof String) {
 //                if (((String) value).isEmpty()) {
 //                    continue;
 //                }
