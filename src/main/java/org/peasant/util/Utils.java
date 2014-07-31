@@ -28,12 +28,12 @@ public class Utils {
     public static int copy(InputStream ins , OutputStream outs) throws IOException{
         int size =0;
         int read;
-        byte[] b = new byte[1024*512];
+        byte[] b = new byte[1024*1024];
         while((read =ins.read(b))>-1){
             outs.write(b, 0, read);
             
             size = size +read;
-        };
+        }
         outs.flush();
         return size;
     }
