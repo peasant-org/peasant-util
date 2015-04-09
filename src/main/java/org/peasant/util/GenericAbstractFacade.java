@@ -5,12 +5,12 @@
  */
 package org.peasant.util;
 
-
 import java.lang.reflect.Array;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
@@ -21,15 +21,38 @@ import javax.persistence.criteria.Root;
  * @author 谢金光
  * @param <T>
  */
-public abstract class GenericFacade<T>{
+public abstract class GenericAbstractFacade<T> {
 
     protected Class<T> entityClass;
 
-    public GenericFacade(Class<T> entityClass) {
+    public GenericAbstractFacade(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 
     protected abstract EntityManager getEntityManager();
+
+    public List<T> findByNamedQuery(String namedquery, Map<String, Object> params) {
+        EntityManager em = getEntityManager();
+        TypedQuery tq = em.createNamedQuery(namedquery, entityClass);
+        if (params != null) {
+            for (Map.Entry<String, Object> e : params.entrySet()) {
+                tq.setParameter(e.getKey(), e.getValue());
+            }
+        }
+        return tq.getResultList();
+
+    }
+
+    public int executeUpdateByNamedQuery(String namedquery, Map<String, Object> params) {
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery(namedquery);
+        if (params != null) {
+            for (Map.Entry<String, Object> e : params.entrySet()) {
+                query.setParameter(e.getKey(), e.getValue());
+            }
+        }
+        return query.executeUpdate();
+    }
 
     public void create(T entity) {
         getEntityManager().persist(entity);

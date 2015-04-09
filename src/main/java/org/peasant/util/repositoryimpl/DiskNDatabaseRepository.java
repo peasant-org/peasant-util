@@ -18,20 +18,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.peasant.util.Attachment;
-import org.peasant.util.GenericFacade;
+import org.peasant.util.GenericAbstractFacade;
 import org.peasant.util.Repository;
 
 /**
- *
+ *此实现使用服务器硬盘系统存储文件，并使用数据库表维护文件目录。
+ * 
  * @author 谢金光
  */
 @Singleton
-public class BasicFileRepository extends GenericFacade<DBAttachment> implements Repository {
+public class DiskNDatabaseRepository extends GenericAbstractFacade<DBAttachment> implements Repository {
 
     public final static String DEFAULT_ATTACH_DIRECTORY = "attachments";
 
@@ -44,10 +47,10 @@ public class BasicFileRepository extends GenericFacade<DBAttachment> implements 
     private static Repository defaultInstance = null;
 
     public static Repository getDefault() {
-        return (null != defaultInstance) ? defaultInstance : new BasicFileRepository();
+        return (null != defaultInstance) ? defaultInstance : new DiskNDatabaseRepository();
     }
 
-    public BasicFileRepository() {
+    public DiskNDatabaseRepository() {
         this((!System.getProperty("user.dir").endsWith(File.separator)
                 ? System.getProperty("user.dir") : System.getProperty("user.dir").substring(0, System.getProperty("user.dir").length() - 1))
                 + File.separator + DEFAULT_ATTACH_DIRECTORY);
@@ -56,9 +59,9 @@ public class BasicFileRepository extends GenericFacade<DBAttachment> implements 
 
     /**
      *
-     * @param homePath must be a abstract pathname,see java.io.File for details;
+     * @param homePath must be a abstract pathname,see @see java.io.File for details;
      */
-    public BasicFileRepository(String homePath) {
+    public DiskNDatabaseRepository(String homePath) {
         super(DBAttachment.class);
         File homeDir = new File(homePath);
         if (homeDir.exists()) {
@@ -121,6 +124,12 @@ public class BasicFileRepository extends GenericFacade<DBAttachment> implements 
             DBFileAttachment da = (DBFileAttachment) a;
             if (da.dba != null) {
                 this.remove(da.dba);
+                try {
+                    Files.deleteIfExists(this.repoDirectory.toPath().resolve(da.dba.getRelPath()));
+                } catch (IOException ex) {
+                    Logger.getLogger(DiskNDatabaseRepository.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                 
             }
             return true;
         }
@@ -229,7 +238,8 @@ public class BasicFileRepository extends GenericFacade<DBAttachment> implements 
                 fName = filename.substring(0, filename.lastIndexOf("."));
                 fType = filename.substring(filename.lastIndexOf(".") + 1);
             }
-            a.setUploadTime(Calendar.getInstance().getTime());
+            if(null==a.getUploadTime())
+                a.setUploadTime(Calendar.getInstance().getTime());
 
             String date = String.format("%1$tY-%1$tm-%1$td", a.getUploadTime());
             String year = String.format("%1$tY", a.getUploadTime());
@@ -281,14 +291,17 @@ public class BasicFileRepository extends GenericFacade<DBAttachment> implements 
 
     protected static class DBFileAttachment implements Attachment {
 
-        final BasicFileRepository repo;
+        final DiskNDatabaseRepository repo;
         final DBAttachment dba;
         InputStream is;
         boolean isInputStreamSeted = false;
 
-        public DBFileAttachment(DBAttachment a, BasicFileRepository repo) {
+        public DBFileAttachment(DBAttachment a, DiskNDatabaseRepository repo) {
             if (null == a) {
                 throw new IllegalArgumentException(DBFileAttachment.class.toString() + ": this \"Dbattachment a\" argument can't not be null!");
+            }
+            if(null == repo){
+                 throw new IllegalArgumentException(DBFileAttachment.class.toString() + ": this \"DiskNDatabaseRepository repo\" argument can't not be null!");
             }
             this.dba = a;
             this.repo = repo;

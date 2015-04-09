@@ -61,7 +61,10 @@ public interface Repository {
      * @param name the value of name
      * @param contentType the value of contentType
      * @param owner the value of owner
+     * @param attacher
      * @param uploadTime the value of uploadTime
+     * @return 
+     * @throws java.io.IOException
      */
     Attachment storeFromStream(InputStream inputStream, String name, String contentType, String owner, String attacher, Date uploadTime) throws IOException;
 

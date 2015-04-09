@@ -51,7 +51,8 @@ public class DBAttachment implements Serializable {
     private String belonger;
     @Size(max = 255)
     private String contentType;
-    @Temporal(TemporalType.DATE)
+    
+    @Temporal(TemporalType.TIMESTAMP)
     private Date uploadTime;
     @Size(max = 1024)
     private String relPath;
