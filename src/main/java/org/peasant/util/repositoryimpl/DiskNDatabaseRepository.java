@@ -33,7 +33,7 @@ import org.peasant.util.Repository;
  * 
  * @author 谢金光
  */
-@Singleton
+
 public class DiskNDatabaseRepository extends GenericAbstractFacade<DBAttachment> implements Repository {
 
     public final static String DEFAULT_ATTACH_DIRECTORY = "attachments";
