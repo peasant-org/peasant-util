@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author 谢金光
  */
 @Entity
-@Table(catalog = "asist", schema = "",name = "attachment")
+@Table(name = "attachment")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "DBAttachment.findAll", query = "SELECT a FROM DBAttachment a"),

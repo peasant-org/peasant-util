@@ -59,7 +59,7 @@ public abstract class GenericAbstractFacade<T> {
     }
 
     public void edit(T entity) {
-        getEntityManager().merge(entity);
+        getEntityManager().merge(entity);        
     }
 
     public void remove(T entity) {
