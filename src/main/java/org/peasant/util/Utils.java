@@ -5,8 +5,10 @@
  */
 package org.peasant.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 /**
@@ -30,6 +32,27 @@ public class Utils {
         }
         os.flush();
         return size;
+
+    }
+
+    public static String getStreamString(InputStream tInputStream) {
+        
+        if (tInputStream != null) {
+            try {
+                BufferedReader tBufferedReader = new BufferedReader(new InputStreamReader(tInputStream));
+                StringBuilder tStringBuffer = new StringBuilder();
+                String sTempOneLine = new String("");
+                while ((sTempOneLine = tBufferedReader.readLine()) != null) {
+                    tStringBuffer.append(sTempOneLine);
+                }
+                return tStringBuffer.toString();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            
+        }
+        
+        return null;
 
     }
 }
