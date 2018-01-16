@@ -35,11 +35,11 @@ public class Utils {
 
     }
 
-    public static String getStreamString(InputStream tInputStream) {
-        
+    public static String getStreamString(InputStream tInputStream, String charset) {
+
         if (tInputStream != null) {
             try {
-                BufferedReader tBufferedReader = new BufferedReader(new InputStreamReader(tInputStream));
+                BufferedReader tBufferedReader = new BufferedReader(new InputStreamReader(tInputStream, charset));
                 StringBuilder tStringBuffer = new StringBuilder();
                 String sTempOneLine = new String("");
                 while ((sTempOneLine = tBufferedReader.readLine()) != null) {
@@ -49,10 +49,20 @@ public class Utils {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            
+
         }
-        
+
         return null;
 
+    }
+
+    /**
+     * 默认使用UTF-8字符集解码
+     *
+     * @param tInputStream
+     * @return
+     */
+    public static String getStreamString(InputStream tInputStream) {
+        return getStreamString(tInputStream, "utf-8");
     }
 }

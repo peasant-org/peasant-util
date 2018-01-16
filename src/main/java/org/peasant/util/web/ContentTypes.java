@@ -14,8 +14,11 @@ import java.net.FileNameMap;
 public class ContentTypes {
 
     public static final String MULTIPART = "multipart/form-data";
+    public static final String APP_URLENCODED ="application/x-www-form-urlencoded";
     public static final String OCTET_STREAM = "application/octet-stream";
     public static final String JSON = "application/json";
+    public static final String XML = "application/xml";
+    public static final String TEXT_XML = "text/xml";
 
     /**
      * Loads filename map (a mimetable) from a data file. It will first try to
