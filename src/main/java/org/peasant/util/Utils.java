@@ -10,6 +10,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 /**
  *
@@ -64,5 +72,48 @@ public class Utils {
      */
     public static String getStreamString(InputStream tInputStream) {
         return getStreamString(tInputStream, "utf-8");
+    }
+
+    /**
+     * 使用JAXB从xml恢复javaBean, javaBean必须拥有无参构造函数
+     *
+     * @param <T>
+     * @param c
+     * @param xml
+     * @return
+     */
+    public static <T extends Object> T xml2Bean(Class<T> c, String xml) {
+        try {
+            JAXBContext jc = JAXBContext.newInstance(c);
+            Unmarshaller us = jc.createUnmarshaller();
+            return (T) us.unmarshal(new StringReader(xml));
+        } catch (JAXBException ex) {
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    /**
+     * 使用JAXB将javaBean转换成xml
+     *
+     * @param <T>
+     * @param bean
+     * @return xml,若转换失败或 {@code bean}为null时，返回空字符串
+     */
+    public static <T extends Object> String bean2xml(T bean) {
+        if (null == bean) {
+            return "";
+        }
+        try {
+            JAXBContext jc = JAXBContext.newInstance(bean.getClass());
+
+            Marshaller ms = jc.createMarshaller();
+            StringWriter sw = new StringWriter();
+            ms.marshal(bean, sw);
+            return sw.toString();
+        } catch (JAXBException ex) {
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
     }
 }
