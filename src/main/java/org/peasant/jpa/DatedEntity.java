@@ -26,11 +26,11 @@ public abstract class DatedEntity extends UUIDEntity implements Serializable {
 
     @Column(name = "create_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
+    protected Date createTime;
 
     @Column(name = "last_update", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdate;
+    protected Date lastUpdate;
 
     public DatedEntity() {
     }
@@ -60,8 +60,6 @@ public abstract class DatedEntity extends UUIDEntity implements Serializable {
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
-
-    
 
     @PrePersist
     public void fixCreateTime() {
